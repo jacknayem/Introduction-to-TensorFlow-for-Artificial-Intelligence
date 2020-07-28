@@ -168,8 +168,10 @@ def train_mnist():
 - Faster
 - Slower
 - It depends on many factors. It might make your training faster or slower, and a poorly designed Convolutional layer may even be less efficient than a plain DNN! **(Answer)**
-#Excersise 3 (Image Classification by Fasion MNIST)
-``python
+
+# Excersise 3 (Image Classification by Fasion MNIST)
+
+```python
 import tensorflow as tf
 print(tf.__version__)
 
@@ -191,8 +193,8 @@ model = tf.keras.models.Sequential([
 ])
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
 model.fit(training_images, training_labels, epochs=5, callbacks=[callbacks])
-``
-#Week 4 Quiz
+```
+# Week 4 Quiz
 **1. Using Image Generator, how do you label images?**
 
 - You have to manually do it
