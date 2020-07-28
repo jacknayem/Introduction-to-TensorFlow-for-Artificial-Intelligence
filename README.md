@@ -1,4 +1,4 @@
-# Exercise 1 (House_Prices)
+# Exercise 1 (Housing Prices)
 In this exercise you'll try to build a neural network that predicts the price of a house according to a simple formula.
 
 So, imagine if house pricing was as easy as a house costs 50k + 50k per bedroom, so that a 1 bedroom house costs 100k, a 2 bedroom house costs 150k etc.
@@ -71,7 +71,7 @@ print(prediction)
 - callbacks= **(Answer)**
 - oncallbacks=
 
-# Exercise 2 (Number Identification)
+# Exercise 2 (Handwriting Recognition)
 In the course you learned how to do classificaiton using Fashion MNIST, a data set containing items of clothing. There's another, similar dataset called MNIST which has items of handwriting -- the digits 0 through 9.
 
 Write an MNIST classifier that trains to 99% accuracy or above, and does it without a fixed number of epochs -- i.e. you should stop training once you reach that level of accuracy.
@@ -169,7 +169,7 @@ def train_mnist():
 - Slower
 - It depends on many factors. It might make your training faster or slower, and a poorly designed Convolutional layer may even be less efficient than a plain DNN! **(Answer)**
 
-# Excersise 3 (Image Classification by Fasion MNIST)
+# Exercise 3 (Improve MNIST with convolutions)
 
 ```python
 import tensorflow as tf
@@ -243,3 +243,92 @@ model.fit(training_images, training_labels, epochs=5, callbacks=[callbacks])
 - There was more condensed information in the images
 - There was less information in the images
 - The training was faster
+# Exercise 4 (Handling complex images)
+Below is code with a link to a happy or sad dataset which contains 80 images, 40 happy and 40 sad. Create a convolutional neural network that trains to 100% accuracy on these images, which cancels training upon hitting training accuracy of >.999
+Hint -- it will work best with 3 convolutional layers.
+```python
+import tensorflow as tf
+import os
+import zipfile
+from os import path, getcwd, chdir
+
+# DO NOT CHANGE THE LINE BELOW. If you are developing in a local
+# environment, then grab happy-or-sad.zip from the Coursera Jupyter Notebook
+# and place it inside a local folder and edit the path to that location
+path = f"{getcwd()}/../tmp2/happy-or-sad.zip"
+
+zip_ref = zipfile.ZipFile(path, 'r')
+zip_ref.extractall("/tmp/h-or-s")
+zip_ref.close()
+# GRADED FUNCTION: train_happy_sad_model
+def train_happy_sad_model():
+    # Please write your code only where you are indicated.
+    # please do not remove # model fitting inline comments.
+
+    DESIRED_ACCURACY = 0.999
+
+    class myCallback(tf.keras.callbacks.Callback):
+         # Your Code
+            def on_epoch_end(self,epoch, logs={}):
+                if(logs.get('acc') > DESIRED_ACCURACY):
+                    print('\nReached 99.9% accuracy so cancelling training!')
+                    self.model.stop_training = True
+
+    callbacks = myCallback()
+    
+    # This Code Block should Define and Compile the Model. Please assume the images are 150 X 150 in your implementation.
+    model = tf.keras.models.Sequential([
+        # Your Code Here
+        tf.keras.layers.Conv2D(16, (3,3), activation='relu', input_shape = (150,150,3)),
+        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
+        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
+        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
+
+    from tensorflow.keras.optimizers import RMSprop
+
+    model.compile(loss='binary_crossentropy',
+                 optimizer=RMSprop(lr=0.001),
+                 metrics=['accuracy'])
+        
+
+    # This code block should create an instance of an ImageDataGenerator called train_datagen 
+    # And a train_generator by calling train_datagen.flow_from_directory
+
+    from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+    train_datagen = ImageDataGenerator(rescale=1/255)
+
+    # Please use a target_size of 150 X 150.
+    train_generator = train_datagen.flow_from_directory(
+        # Your Code Here
+        "/tmp/h-or-s",
+        target_size=(150,150),
+        batch_size=128,
+        class_mode = 'binary')
+    # Expected output: 'Found 80 images belonging to 2 classes'
+
+    # This code block should call model.fit_generator and train for
+    # a number of epochs.
+    # model fitting
+    history = model.fit_generator(
+          # Your Code Here
+        train_generator,
+        steps_per_epoch = 8,
+        epochs=15,
+        verbose=1,
+        callbacks=[callbacks]
+    )
+        
+    # model fitting
+    return history.history['acc'][-1]
+    
+    # The Expected output: "Reached 99.9% accuracy so cancelling training!""
+train_happy_sad_model()
+
+```
