@@ -71,7 +71,7 @@ print(prediction)
 - callbacks= **(Answer)**
 - oncallbacks=
 
-# Exercise 2
+# Exercise 2 (Number Identification)
 In the course you learned how to do classificaiton using Fashion MNIST, a data set containing items of clothing. There's another, similar dataset called MNIST which has items of handwriting -- the digits 0 through 9.
 
 Write an MNIST classifier that trains to 99% accuracy or above, and does it without a fixed number of epochs -- i.e. you should stop training once you reach that level of accuracy.
@@ -168,3 +168,76 @@ def train_mnist():
 - Faster
 - Slower
 - It depends on many factors. It might make your training faster or slower, and a poorly designed Convolutional layer may even be less efficient than a plain DNN! **(Answer)**
+#Excersise 3 (Image Classification by Fasion MNIST)
+``python
+import tensorflow as tf
+print(tf.__version__)
+
+class myCallback(tf.keras.callbacks.Callback):
+  def on_epoch_end(self, epoch, logs={}):
+    if(logs.get('loss')<0.4):
+      print("\nReached 60% accuracy so cancelling training!")
+      self.model.stop_training = True
+
+callbacks = myCallback()
+mnist = tf.keras.datasets.fashion_mnist
+(training_images, training_labels), (test_images, test_labels) = mnist.load_data()
+training_images=training_images/255.0
+test_images=test_images/255.0
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Flatten(),
+  tf.keras.layers.Dense(512, activation=tf.nn.relu),
+  tf.keras.layers.Dense(10, activation=tf.nn.softmax)
+])
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
+model.fit(training_images, training_labels, epochs=5, callbacks=[callbacks])
+``
+#Week 4 Quiz
+**1. Using Image Generator, how do you label images?**
+
+- You have to manually do it
+- It’s based on the file name
+- TensorFlow figures it out from the contents
+- It’s based on the directory the image is contained in **(Answer)**
+
+**2. What method on the Image Generator is used to normalize the image?**
+
+- normalize_image
+- rescale **(Answer)**
+- Rescale_image
+- normalize
+
+**3. How did we specify the training size for the images?**
+
+- The training_size parameter on the validation generator
+- The target_size parameter on the training generator **(Answer)**
+- The target_size parameter on the validation generator
+- The training_size parameter on the training generator
+
+**4. When we specify the input_shape to be (300, 300, 3), what does that mean?**
+
+- Every Image will be 300x300 pixels, with 3 bytes to define color **(Answer)**
+- There will be 300 images, each size 300, loaded in batches of 3
+- There will be 300 horses and 300 humans, loaded in batches of 3
+- Every Image will be 300x300 pixels, and there should be 3 Convolutional Layers
+
+**5. If your training data is close to 1.000 accuracy, but your validation data isn’t, what’s the risk here?**
+
+- No risk, that’s a great result
+- You’re overfitting on your validation data
+- You’re underfitting on your validation data
+- You’re overfitting on your training data **(Answer)**
+
+**6. Convolutional Neural Networks are better for classifying images like horses and humans because:**
+
+- In these images, the features may be in different parts of the frame
+- There’s a wide variety of horses
+- There’s a wide variety of humans
+- All of the above **(Answer)**
+
+**7. After reducing the size of the images, the training results were different. Why?**
+
+- We removed some convolutions to handle the smaller images **(Answer)**
+- There was more condensed information in the images
+- There was less information in the images
+- The training was faster
